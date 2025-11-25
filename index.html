@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIGE SmartSync - Syllabus Calendar Generator</title>
+    <style>
+        /* UNIGE Typography: TheSans with fallbacks for multimedia/web (Verdana, Arial) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "TheSans", "TheSans-Regular", Verdana, Arial, sans-serif;
+            background: linear-gradient(135deg, #CF0063 0%, #B80057 50%, #A0004B 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .unige-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .unige-logo-img {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 10px;
+            display: block;
+        }
+
+        .unige-logo {
+            font-family: "TheSans", "TheSans-Bold", Verdana, Arial, sans-serif;
+            font-size: 1.2em;
+            font-weight: 700; /* TheSans 7 / TheSans bold */
+            color: #CF0063;
+            letter-spacing: 0.05em;
+            margin-bottom: 5px;
+        }
+
+        .unige-subtitle {
+            font-family: "TheSans", "TheSans-Regular", Verdana, Arial, sans-serif;
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 400; /* TheSans 5 / TheSans normal/regular */
+        }
+
+        h1 {
+            font-family: "TheSans", "TheSans-SemiBold", Verdana, Arial, sans-serif;
+            color: #CF0063;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            text-align: center;
+            font-weight: 600; /* TheSans 6 / TheSans semi-bold */
+        }
+
+        .subtitle {
+            font-family: "TheSans", "TheSans-Regular", Verdana, Arial, sans-serif;
+            color: #555;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            font-weight: 400; /* TheSans 5 / TheSans normal/regular */
+        }
+
+        .upload-area {
+            border: 3px dashed #CF0063;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #FFF0F8;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #A0004B;
+            background: #FFE6F2;
+        }
+
+        .upload-area.dragover {
+            border-color: #A0004B;
+            background: #FFD9EB;
+            transform: scale(1.02);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            font-family: "TheSans", "TheSans-SemiBold", Verdana, Arial, sans-serif;
+            display: inline-block;
+            padding: 12px 24px;
+            background: #CF0063;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600; /* TheSans 6 / TheSans semi-bold */
+            transition: background 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            background: #B80057;
+        }
+
+        .file-name {
+            font-family: "TheSans", "TheSans-Regular", Verdana, Arial, sans-serif;
+            margin-top: 15px;
+            color: #333;
+            font-weight: 400; /* TheSans 5 / TheSans normal/regular */
+        }
+
+        .generate-btn {
+            font-family: "TheSans", "TheSans-SemiBold", Verdana, Arial, sans-serif;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #A0004B 0%, #CF0063 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600; /* TheSans 6 / TheSans semi-bold */
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(207, 0, 99, 0.4);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            font-family: "TheSans", "TheSans-Regular", Verdana, Arial, sans-serif;
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #CF0063;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #CF0063;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            font-family: "TheSans", "TheSans-Regular", Verdana, Arial, sans-serif;
+            display: none;
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #c33;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .success {
+            font-family: "TheSans", "TheSans-Regular", Verdana, Arial, sans-serif;
+            display: none;
+            background: #efe;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #3c3;
+        }
+
+        .success.active {
+            display: block;
+        }
+
+        .info {
+            font-family: "TheSans", "TheSans-Regular", Verdana, Arial, sans-serif;
+            background: #FFE6F2;
+            color: #A0004B;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #CF0063;
+            font-size: 0.9em;
+            font-weight: 400; /* TheSans 5 / TheSans normal/regular */
+        }
+
+        .unige-footer {
+            font-family: "TheSans", "TheSans-Light", Verdana, Arial, sans-serif;
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 300; /* TheSans 3 / TheSans light */
+        }
+
+        .info ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="unige-header">
+            <img src="/static/Uni_GE_logo.svg" alt="Université de Genève - UNIGE" class="unige-logo-img" />
+        </div>
+        <h1>SmartSync</h1>
+        <p class="subtitle">Convert your syllabus into a calendar</p>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" accept=".pdf,.txt" />
+                <label for="fileInput" class="file-input-label">
+                    📄 Choose Syllabus File (PDF or TXT)
+                </label>
+            </div>
+            <div class="file-name" id="fileName"></div>
+        </div>
+
+        <button class="generate-btn" id="generateBtn" disabled>
+            Generate Calendar (.ics)
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing syllabus and extracting dates...</p>
+        </div>
+
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+
+        <div class="info">
+            <strong>How it works:</strong>
+            <ul>
+                <li>Upload your course syllabus (PDF or TXT)</li>
+                <li>AI extracts all important dates and deadlines</li>
+                <li>Download a calendar file (.ics) to import into Google Calendar, Apple Calendar, or Outlook</li>
+            </ul>
+        </div>
+        <div class="unige-footer">
+            Université de Genève - UNIGE SmartSync
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const generateBtn = document.getElementById('generateBtn');
+        const uploadArea = document.getElementById('uploadArea');
+        const loading = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const successDiv = document.getElementById('success');
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                fileName.textContent = `Selected: ${file.name}`;
+                generateBtn.disabled = false;
+                hideMessages();
+            }
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const file = e.dataTransfer.files[0];
+            if (file && (file.type === 'application/pdf' || file.name.endsWith('.txt'))) {
+                fileInput.files = e.dataTransfer.files;
+                fileName.textContent = `Selected: ${file.name}`;
+                generateBtn.disabled = false;
+                hideMessages();
+            } else {
+                showError('Please upload a PDF or TXT file.');
+            }
+        });
+
+        // Generate button click
+        generateBtn.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                showError('Please select a file first.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Show loading, hide other messages
+            loading.classList.add('active');
+            generateBtn.disabled = true;
+            hideMessages();
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    // Get the blob and trigger download
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'syllabus_deadlines.ics';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    showSuccess('Calendar file generated and downloaded successfully!');
+                } else {
+                    const errorData = await response.json();
+                    showError(errorData.error || 'An error occurred while processing the file.');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                loading.classList.remove('active');
+                generateBtn.disabled = false;
+            }
+        });
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.classList.add('active');
+            successDiv.classList.remove('active');
+        }
+
+        function showSuccess(message) {
+            successDiv.textContent = message;
+            successDiv.classList.add('active');
+            errorDiv.classList.remove('active');
+        }
+
+        function hideMessages() {
+            errorDiv.classList.remove('active');
+            successDiv.classList.remove('active');
+        }
+    </script>
+</body>
+</html>
+
