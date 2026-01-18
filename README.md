@@ -91,7 +91,7 @@ SmartSync/
 
 Notes
 
-- The app uses OpenAI's `gpt-4o-mini` model for cost efficiency
+- The app uses OpenAI's gpt-4o-mini model for cost efficiency
 - Large syllabus files (>50,000 characters) are truncated to stay within API limits
 - All-day events are used when no specific time is found in the syllabus
 - Events with invalid dates are automatically skipped
