@@ -1,65 +1,83 @@
 # UNIGE SmartSync - Syllabus Calendar Generator
 
-A web application for the University of Geneva (UNIGE) that extracts important dates and deadlines from course syllabi (PDF or TXT) using OpenAI's ChatGPT API and generates downloadable .ics calendar files.
+UNIGE SmartSync is a small web app built for students at the University of Geneva. It takes a course syllabus (PDF or TXT), finds important dates like exams and deadlines using OpenAI, and turns them into a calendar file you can import into Google Calendar, Apple Calendar, Outlook, etc.
 
-## Features
+The goal is simple: no more manually copying dates from PDFs into your calendar.
 
-- 📄 Upload PDF or TXT syllabus files
-- 🤖 AI-powered date extraction using OpenAI GPT
-- 📅 Generate .ics calendar files compatible with Google Calendar, Apple Calendar, and Outlook
-- 🎨 Clean, modern web interface
+Features
 
-## Setup
+- Upload syllabus files in PDF or TXT format
 
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+- Automatic date and deadline extraction using OpenAI
 
-2. **Set up OpenAI API key:**
-   - Get your API key from [OpenAI](https://platform.openai.com/api-keys)
-   - Create a `.env` file in the project root:
-     ```
-     OPENAI_API_KEY=your_api_key_here
-     ```
-   - Or export it as an environment variable:
-     ```bash
-     export OPENAI_API_KEY=your_api_key_here
-     ```
+- Export events as a standard .ics calendar file
 
-3. **Run the application:**
-   ```bash
-   python app.py
-   ```
+- Works with Google Calendar, Apple Calendar, Outlook, and more
 
-4. **Open your browser:**
-   Navigate to `http://localhost:5001`
+- Clean and lightweight web interface
 
-## Usage
+Setup
+1. Install dependencies
+pip install -r requirements.txt
 
-1. Click "Choose Syllabus File" or drag and drop a PDF or TXT file
-2. Click "Generate Calendar (.ics)"
-3. Wait for processing (the AI will extract dates from your syllabus)
-4. The .ics file will automatically download
-5. Import the file into your preferred calendar application
+2. Set your OpenAI API key
 
-## How It Works
+- Get your API key from OpenAI, then either:
 
-1. **File Upload**: Accepts PDF or TXT files up to 16MB
-2. **Text Extraction**: 
-   - PDFs: Uses PyPDF2 to extract text
-   - TXT: Reads file directly
-3. **AI Processing**: Sends extracted text to OpenAI GPT-4o-mini with a specialized prompt to identify dates, deadlines, exams, assignments, etc.
-4. **Calendar Generation**: Converts the extracted events into a valid .ics (iCalendar) format
-5. **Download**: Returns the .ics file for the user to download
+- Create a .env file in the project root:
 
-## Requirements
+- OPENAI_API_KEY=your_api_key_here
 
-- Python 3.7+
+
+- Or export it as an environment variable: export OPENAI_API_KEY=your_api_key_here
+
+3. Run the app
+python app.py
+
+
+Then open your browser and go to:
+
+http://localhost:5001
+
+
+How to use
+
+- Click “Choose Syllabus File” (or drag and drop a file)
+
+- Select a PDF or TXT syllabus
+
+- Click “Generate Calendar (.ics)”
+
+- Wait a few seconds while the dates are extracted
+
+- The calendar file will download automatically
+
+- Import it into your favorite calendar app
+
+
+How it works (behind the scenes)
+
+- File upload – accepts PDF or TXT files up to 16 MB
+
+- Text extraction
+
+- PDFs are processed with PyPDF2
+
+- TXT files are read directly
+
+- AI processing – the extracted text is sent to OpenAI (GPT-4o-mini) with a prompt that looks for exams, deadlines, assignments, etc.
+
+- Calendar generation – detected events are converted into a valid .ics file
+
+- Download – the file is returned to the user
+
+Requirements
+
+- Python 3.7 or newer
+
 - OpenAI API key
-- Flask and dependencies (see `requirements.txt`)
 
-## File Structure
+- Flask and other dependencies (see requirements.txt)
 
 ```
 SmartSync/
@@ -71,7 +89,7 @@ SmartSync/
 └── README.md          # This file
 ```
 
-## Notes
+Notes
 
 - The app uses OpenAI's `gpt-4o-mini` model for cost efficiency
 - Large syllabus files (>50,000 characters) are truncated to stay within API limits
